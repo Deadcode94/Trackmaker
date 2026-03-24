@@ -5,9 +5,7 @@ It allows level designers and modders to create complex, sweeping 3D meshes alon
 
 The editor provides a modern UI, 3D manipulation gizmos, and seamless export to game-ready formats like `OBJ` for meshes and `JSON` for AI pathfinding.
 
-!Trackmaker Editor
-!Platform
-!C++
+**Type:** 3D Procedural Editor | **Platform:** Windows | **Language:** C++17
 
 ---
 
@@ -94,9 +92,9 @@ This project uses **CMake** to manage dependencies and build the executable. The
 
 ## Credits & Acknowledgments
 
-This project is built upon the foundation of the original Mac + Windows Trackmaker engine https://github.com/cochrane/trackmaker and relies on several fantastic open-source libraries.
+This project is built upon the foundation of the original Mac + Windows Trackmaker engine and relies on several fantastic open-source libraries.
 
-- **Original Trackmaker & Core Math Engine:** cochrane (Author of the original track generation algorithms found in /src/shared/).
+- **Original Trackmaker & Core Math Engine:** cochrane (Author of the original track generation algorithms found in `/src/shared/`).
 - **Raylib:** A simple and easy-to-use library to enjoy videogames programming by Ramon Santamaria.
 - **Dear ImGui:** Bloat-free Graphical User interface for C++ with minimal dependencies by Omar Cornut.
 - **ImGuizmo:** Immediate mode 3D gizmo for scene manipulation by Cedric Guillemet.
