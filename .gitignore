@@ -1,0 +1,13 @@
+.vs/
+.vscode/
+
+/build/
+/out/
+
+*.obj
+!assets/*.obj
+
+*.exe
+
+scripts/python_visualizers/
+assets/export/
