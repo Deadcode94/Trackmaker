@@ -1,0 +1,29 @@
+<<<<<<< HEAD
+.vs/
+.vscode/
+
+/build/
+/out/
+
+*.obj
+!assets/*.obj
+
+*.exe
+
+scripts/python_visualizers/
+assets/export/
+=======
+.vs/
+.vscode/
+
+/build/
+/out/
+
+*.obj
+!assets/*.obj
+
+*.exe
+
+scripts/python_visualizers/
+assets/export/
+>>>>>>> 2147e2d76ea80437e46a4f8ad037ef57b7cffbbc
