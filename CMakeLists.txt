@@ -88,3 +88,31 @@ target_include_directories(TrackmakerEditor PRIVATE
 
 # 6. Link libraries (Only Raylib needs dynamic linking)
 target_link_libraries(TrackmakerEditor PRIVATE raylib)
+
+# ==============================================================================
+# 7. Installation & Packaging (CPack)
+# ==============================================================================
+
+# 7.1 Define what files go into the final release folder/zip
+# Install the compiled executable
+install(TARGETS TrackmakerEditor DESTINATION .)
+# Install the assets directory alongside the executable
+install(DIRECTORY ${CMAKE_SOURCE_DIR}/assets DESTINATION .)
+# Install documentation
+install(FILES ${CMAKE_SOURCE_DIR}/README.md DESTINATION .)
+
+# 7.2 Configure CPack to generate a ZIP file
+set(CPACK_GENERATOR "ZIP")
+set(CPACK_PACKAGE_NAME "Trackmaker")
+set(CPACK_PACKAGE_FILE_NAME "TrackmakerEditor-${CMAKE_SYSTEM_NAME}")
+set(CPACK_INCLUDE_TOPLEVEL_DIRECTORY OFF) # Don't put everything inside an extra parent folder in the ZIP
+
+include(CPack)
+
+# 7.3 Add a custom target to build the release zip easily
+add_custom_target(release
+    DEPENDS TrackmakerEditor
+    COMMAND ${CMAKE_CPACK_COMMAND} -G ZIP
+    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+    COMMENT "Creating release zip file with CPack..."
+)
