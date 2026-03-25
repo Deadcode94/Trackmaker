@@ -1,172 +1,87 @@
 #include "os_utils.h"
-#include <windows.h>
-#include <commdlg.h>
+
+#if defined(_WIN32)
+// 1. Inganniamo l'API di Windows (inclusa da pfd) rinominando le funzioni
+// in modo che non occupino i nomi usati da Raylib.
+#define Rectangle WinRectangle
+#define CloseWindow WinCloseWindow
+#define ShowCursor WinShowCursor
+#endif
+
+#include "portable-file-dialogs.h"
+
+#if defined(_WIN32)
+// 2. Ripristiniamo i nomi per sbloccarli a Raylib
+#undef Rectangle
+#undef CloseWindow
+#undef ShowCursor
+// 3. Rimuoviamo le vere macro di Windows che si accavallano a Raylib
+#undef LoadImage
+#undef DrawText
+#undef DrawTextEx
+#undef PlaySound
+#endif
+
+#include "raylib.h"
+#include <filesystem>
 
 namespace OSUtils {
 
     // Helper to get the absolute path to the project's assets folder
     std::string GetAbsoluteAssetPath(const std::string& subfolder) {
-        char buffer[MAX_PATH];
-        GetModuleFileNameA(NULL, buffer, MAX_PATH);
-        std::string path(buffer);
+        // GetApplicationDirectory() è fornita da Raylib ed è al 100% multipiattaforma
+        std::filesystem::path basePath(GetApplicationDirectory());
         
-        // Remove the executable name to get the current directory
-        size_t lastSlash = path.find_last_of("\\/");
-        if (lastSlash != std::string::npos) {
-            path = path.substr(0, lastSlash);
-        }
-
-        // Save the executable directory to use as a failsafe fallback
-        std::string exeDir = path;
-
-        // Traverse up the directory tree (up to 5 levels) to find the "assets" folder
         for (int i = 0; i < 5; ++i) {
-            std::string testPath = path + "\\assets";
-            DWORD attrib = GetFileAttributesA(testPath.c_str());
-            if (attrib != INVALID_FILE_ATTRIBUTES && (attrib & FILE_ATTRIBUTE_DIRECTORY)) {
-                return testPath + "\\" + subfolder;
+            std::filesystem::path testPath = basePath / "assets";
+            if (std::filesystem::exists(testPath) && std::filesystem::is_directory(testPath)) {
+                // ".make_preferred()" converte i path separator in "\\" su Windows e "/" su Mac/Linux
+                return (testPath / subfolder).make_preferred().string();
             }
             
-            // Go up one level
-            lastSlash = path.find_last_of("\\/");
-            if (lastSlash != std::string::npos) {
-                path = path.substr(0, lastSlash);
-            } else {
-                break;
-            }
+            if (!basePath.has_parent_path()) break;
+            basePath = basePath.parent_path();
         }
         
-        return exeDir; // Fallback to the executable's exact folder
+        // Fallback: ritorna la directory dell'eseguibile se non trova la cartella assets
+        return GetApplicationDirectory();
     }
 
     std::string OpenImageFileDialog() {
-        char filename[MAX_PATH] = { 0 };
-        OPENFILENAMEA ofn;
-        ZeroMemory(&ofn, sizeof(ofn));
-        ofn.lStructSize = sizeof(ofn);
-        ofn.hwndOwner = NULL;
-        // Filter specifically for common image formats supported by Raylib
-        ofn.lpstrFilter = "Image Files\0*.png;*.jpg;*.bmp;*.tga\0All Files (*.*)\0*.*\0";
-        ofn.lpstrFile = filename;
-        ofn.nMaxFile = MAX_PATH;
-        ofn.Flags = OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
-        ofn.lpstrDefExt = "";
-        
-        std::string initDir = GetAbsoluteAssetPath("textures");
-        ofn.lpstrInitialDir = initDir.c_str();
-
-        if (GetOpenFileNameA(&ofn)) {
-            return std::string(filename);
-        }
-        return "";
+        auto f = pfd::open_file("Open Image File", GetAbsoluteAssetPath("textures"),
+                                { "Image Files", "*.png *.jpg *.bmp *.tga", "All Files", "*" });
+        return f.result().empty() ? "" : f.result()[0];
     }
 
     std::string OpenTrackTemplateDialog() {
-        char filename[MAX_PATH] = { 0 };
-        OPENFILENAMEA ofn;
-        ZeroMemory(&ofn, sizeof(ofn));
-        ofn.lStructSize = sizeof(ofn);
-        ofn.hwndOwner = NULL;
-        ofn.lpstrFilter = "Track Templates (*.tracktemplate)\0*.tracktemplate\0All Files (*.*)\0*.*\0";
-        ofn.lpstrFile = filename;
-        ofn.nMaxFile = MAX_PATH;
-        ofn.Flags = OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
-        ofn.lpstrDefExt = "tracktemplate";
-        
-        std::string initDir = GetAbsoluteAssetPath("tracktemplates");
-        ofn.lpstrInitialDir = initDir.c_str();
-
-        if (GetOpenFileNameA(&ofn)) {
-            return std::string(filename);
-        }
-        return "";
+        auto f = pfd::open_file("Open Track Template", GetAbsoluteAssetPath("tracktemplates"),
+                                { "Track Templates", "*.tracktemplate", "All Files", "*" });
+        return f.result().empty() ? "" : f.result()[0];
     }
 
 
     std::string SaveTrackFileDialog() {
-        char filename[MAX_PATH] = { 0 };
-        OPENFILENAMEA ofn;
-        ZeroMemory(&ofn, sizeof(ofn));
-        ofn.lStructSize = sizeof(ofn);
-        ofn.hwndOwner = NULL;
-        ofn.lpstrFilter = "Track Files (*.track)\0*.track\0All Files (*.*)\0*.*\0";
-        ofn.lpstrFile = filename;
-        ofn.nMaxFile = MAX_PATH;
-        // OFN_OVERWRITEPROMPT ensures Windows warns you before replacing a file
-        ofn.Flags = OFN_EXPLORER | OFN_PATHMUSTEXIST | OFN_OVERWRITEPROMPT;
-        ofn.lpstrDefExt = "track";
-        
-        std::string initDir = GetAbsoluteAssetPath("tracks");
-        ofn.lpstrInitialDir = initDir.c_str();
-
-        if (GetSaveFileNameA(&ofn)) {
-            return std::string(filename);
-        }
-        return "";
+        auto f = pfd::save_file("Save Track File", GetAbsoluteAssetPath("tracks") + "/new_track.track",
+                                { "Track Files", "*.track", "All Files", "*" });
+        return f.result();
     }
 
     std::string OpenTrackFileDialog() {
-        char filename[MAX_PATH] = { 0 };
-        OPENFILENAMEA ofn;
-        ZeroMemory(&ofn, sizeof(ofn));
-        ofn.lStructSize = sizeof(ofn);
-        ofn.hwndOwner = NULL;
-        // Filter specifically for your saved road layouts
-        ofn.lpstrFilter = "Track Files (*.track)\0*.track\0All Files (*.*)\0*.*\0";
-        ofn.lpstrFile = filename;
-        ofn.nMaxFile = MAX_PATH;
-        ofn.Flags = OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
-        ofn.lpstrDefExt = "track";
-        
-        std::string initDir = GetAbsoluteAssetPath("tracks");
-        ofn.lpstrInitialDir = initDir.c_str();
-
-        if (GetOpenFileNameA(&ofn)) {
-            return std::string(filename);
-        }
-        return "";
+        auto f = pfd::open_file("Open Track File", GetAbsoluteAssetPath("tracks"),
+                                { "Track Files", "*.track", "All Files", "*" });
+        return f.result().empty() ? "" : f.result()[0];
     }
 
     std::string SaveObjFileDialog() {
-        char filename[MAX_PATH] = { 0 };
-        OPENFILENAMEA ofn;
-        ZeroMemory(&ofn, sizeof(ofn));
-        ofn.lStructSize = sizeof(ofn);
-        ofn.hwndOwner = NULL;
-        ofn.lpstrFilter = "OBJ Files (*.obj)\0*.obj\0All Files (*.*)\0*.*\0";
-        ofn.lpstrFile = filename;
-        ofn.nMaxFile = MAX_PATH;
-        ofn.Flags = OFN_EXPLORER | OFN_PATHMUSTEXIST | OFN_OVERWRITEPROMPT;
-        ofn.lpstrDefExt = "obj";
-
-        std::string initDir = GetAbsoluteAssetPath("export");
-        ofn.lpstrInitialDir = initDir.c_str();
-
-        if (GetSaveFileNameA(&ofn)) {
-            return std::string(filename);
-        }
-        return "";
+        auto f = pfd::save_file("Export OBJ", GetAbsoluteAssetPath("export") + "/export.obj",
+                                { "OBJ Files", "*.obj", "All Files", "*" });
+        return f.result();
     }
 
     std::string SaveJsonFileDialog() {
-        char filename[MAX_PATH] = { 0 };
-        OPENFILENAMEA ofn;
-        ZeroMemory(&ofn, sizeof(ofn));
-        ofn.lStructSize = sizeof(ofn);
-        ofn.hwndOwner = NULL;
-        ofn.lpstrFilter = "JSON Files (*.json)\0*.json\0All Files (*.*)\0*.*\0";
-        ofn.lpstrFile = filename;
-        ofn.nMaxFile = MAX_PATH;
-        ofn.Flags = OFN_EXPLORER | OFN_PATHMUSTEXIST | OFN_OVERWRITEPROMPT;
-        ofn.lpstrDefExt = "json";
-
-        std::string initDir = GetAbsoluteAssetPath("export");
-        ofn.lpstrInitialDir = initDir.c_str();
-
-        if (GetSaveFileNameA(&ofn)) {
-            return std::string(filename);
-        }
-        return "";
+        auto f = pfd::save_file("Export AI Waypoints (JSON)", GetAbsoluteAssetPath("export") + "/waypoints.json",
+                                { "JSON Files", "*.json", "All Files", "*" });
+        return f.result();
     }
 
 }

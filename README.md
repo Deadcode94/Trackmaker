@@ -1,11 +1,11 @@
 # Trackmaker
 
-Trackmaker is a powerful, procedural 3D track and road generation editor for Windows. 
+Trackmaker is a powerful, procedural 3D track and road generation editor for Windows, macOS, and Linux. 
 It allows level designers and modders to create complex, sweeping 3D meshes along Bezier splines by extruding 2D cross-section templates.
 
 The editor provides a modern UI, 3D manipulation gizmos, and seamless export to game-ready formats like `OBJ` for meshes and `JSON` for AI pathfinding.
 
-**Type:** 3D Procedural Editor | **Platform:** Windows | **Language:** C++17
+**Type:** 3D Procedural Editor | **Platform:** Windows, macOS, Linux | **Language:** C++17
 
 ---
 
@@ -28,8 +28,25 @@ The editor provides a modern UI, 3D manipulation gizmos, and seamless export to 
 This project uses **CMake** to manage dependencies and build the executable. The main rendering backend is driven by **Raylib**.
 
 ### Prerequisites
-- C++17 compatible compiler (MSVC, MinGW, or GCC/Clang).
-- CMake (3.15 or higher).
+- C++17 compatible compiler (MSVC, MinGW, GCC, or Clang).
+- CMake (3.15 or higher) and Git.
+
+#### System Dependencies
+**Windows**
+- Visual Studio (with "Desktop development with C++") or MinGW.
+
+**Linux (Ubuntu/Debian)**
+- You must install the build tools and Raylib's required native dependencies:
+  ```bash
+  sudo apt update
+  sudo apt install build-essential git cmake libasound2-dev libx11-dev libxrandr-dev libxi-dev libgl1-mesa-dev libglu1-mesa-dev libxcursor-dev libxinerama-dev libwayland-dev libxkbcommon-dev
+  ```
+
+**macOS**
+- Install the Apple Command Line Tools:
+  ```bash
+  xcode-select --install
+  ```
 
 ### Build Steps
 
@@ -53,7 +70,11 @@ This project uses **CMake** to manage dependencies and build the executable. The
 
 4. Run the editor:
    ```bash
-   ./Release/Trackmaker.exe
+   # On Windows (MSVC)
+   ./Release/TrackmakerEditor.exe
+   
+   # On Linux / macOS (Makefile/Ninja)
+   ./TrackmakerEditor
    ```
    *(Note: Ensure the `assets` folder is in the working directory or parent directories so the program can load templates and textures).*
 

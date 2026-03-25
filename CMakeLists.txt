@@ -38,6 +38,16 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(imguizmo)
 
+# 3.6 Fetch portable-file-dialogs (Cross-platform file dialogs)
+FetchContent_Declare(
+    pfd
+    GIT_REPOSITORY https://github.com/samhocevar/portable-file-dialogs.git
+    GIT_TAG main
+)
+set(CMAKE_POLICY_VERSION_MINIMUM 3.5)
+FetchContent_MakeAvailable(pfd)
+unset(CMAKE_POLICY_VERSION_MINIMUM)
+
 # 4. Define our executable and ALL source files
 add_executable(TrackmakerEditor 
     src/main_editor.cpp
@@ -70,6 +80,7 @@ target_include_directories(TrackmakerEditor PRIVATE
     ${imgui_SOURCE_DIR}
     ${rlimgui_SOURCE_DIR}
     ${imguizmo_SOURCE_DIR}
+    ${pfd_SOURCE_DIR}
     src
     src/shared
     .
