@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.14)
-project(TrackmakerEditor CXX)
+project(TrackmakerEditor VERSION 1.0.1 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -104,7 +104,7 @@ install(FILES ${CMAKE_SOURCE_DIR}/README.md DESTINATION . COMPONENT TrackmakerAp
 # 7.2 Configure CPack to generate a ZIP file
 set(CPACK_GENERATOR "ZIP")
 set(CPACK_PACKAGE_NAME "Trackmaker")
-set(CPACK_PACKAGE_FILE_NAME "TrackmakerEditor-${CMAKE_SYSTEM_NAME}")
+set(CPACK_PACKAGE_FILE_NAME "TrackmakerEditor-${PROJECT_VERSION}-${CMAKE_SYSTEM_NAME}")
 set(CPACK_INCLUDE_TOPLEVEL_DIRECTORY OFF) # Don't put everything inside an extra parent folder in the ZIP
 
 # Tell CPack to ONLY package our component, ignoring Raylib's dev files

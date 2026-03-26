@@ -1484,7 +1484,7 @@ int main(void) {
     const int screenHeight = 720;
 
     SetConfigFlags(FLAG_WINDOW_RESIZABLE | FLAG_MSAA_4X_HINT);
-    InitWindow(screenWidth, screenHeight, "Trackmaker - Windows Editor");
+    InitWindow(screenWidth, screenHeight, "Trackmaker 1.0.1");
 
     // Increase the far clipping plane distance to render massive track layouts.
     // Pushing the near plane to 10.0 further avoids aggressive Z-buffer precision loss.
