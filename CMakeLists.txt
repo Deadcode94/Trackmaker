@@ -95,17 +95,20 @@ target_link_libraries(TrackmakerEditor PRIVATE raylib)
 
 # 7.1 Define what files go into the final release folder/zip
 # Install the compiled executable
-install(TARGETS TrackmakerEditor DESTINATION .)
+install(TARGETS TrackmakerEditor DESTINATION . COMPONENT TrackmakerApp)
 # Install the assets directory alongside the executable
-install(DIRECTORY ${CMAKE_SOURCE_DIR}/assets DESTINATION .)
+install(DIRECTORY ${CMAKE_SOURCE_DIR}/assets DESTINATION . COMPONENT TrackmakerApp)
 # Install documentation
-install(FILES ${CMAKE_SOURCE_DIR}/README.md DESTINATION .)
+install(FILES ${CMAKE_SOURCE_DIR}/README.md DESTINATION . COMPONENT TrackmakerApp)
 
 # 7.2 Configure CPack to generate a ZIP file
 set(CPACK_GENERATOR "ZIP")
 set(CPACK_PACKAGE_NAME "Trackmaker")
 set(CPACK_PACKAGE_FILE_NAME "TrackmakerEditor-${CMAKE_SYSTEM_NAME}")
 set(CPACK_INCLUDE_TOPLEVEL_DIRECTORY OFF) # Don't put everything inside an extra parent folder in the ZIP
+
+# Tell CPack to ONLY package our component, ignoring Raylib's dev files
+set(CPACK_COMPONENTS_ALL TrackmakerApp)
 
 include(CPack)
 

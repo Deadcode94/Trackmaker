@@ -78,6 +78,13 @@ This project uses **CMake** to manage dependencies and build the executable. The
    ```
    *(Note: Ensure the `assets` folder is in the working directory or parent directories so the program can load templates and textures).*
 
+5. Package for Distribution (Optional):
+   To create a clean, distributable `.zip` file containing only the executable and necessary assets (without development libraries), run the custom release target:
+   ```bash
+   cmake --build . --config Release --target release
+   ```
+   *This will generate a `TrackmakerEditor-<OS>.zip` file in your build directory.*
+
 ---
 
 ## Controls & Usage
