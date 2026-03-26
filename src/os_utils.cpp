@@ -1,8 +1,8 @@
 #include "os_utils.h"
 
 #if defined(_WIN32)
-// 1. Inganniamo l'API di Windows (inclusa da pfd) rinominando le funzioni
-// in modo che non occupino i nomi usati da Raylib.
+// 1. Trick the Windows API (included by pfd) by renaming the functions
+// so that they don't occupy the names used by Raylib.
 #define Rectangle WinRectangle
 #define CloseWindow WinCloseWindow
 #define ShowCursor WinShowCursor
@@ -11,11 +11,11 @@
 #include "portable-file-dialogs.h"
 
 #if defined(_WIN32)
-// 2. Ripristiniamo i nomi per sbloccarli a Raylib
+// 2. Restore the names to unlock them for Raylib
 #undef Rectangle
 #undef CloseWindow
 #undef ShowCursor
-// 3. Rimuoviamo le vere macro di Windows che si accavallano a Raylib
+// 3. Remove the actual Windows macros that overlap with Raylib
 #undef LoadImage
 #undef DrawText
 #undef DrawTextEx
@@ -29,13 +29,13 @@ namespace OSUtils {
 
     // Helper to get the absolute path to the project's assets folder
     std::string GetAbsoluteAssetPath(const std::string& subfolder) {
-        // GetApplicationDirectory() è fornita da Raylib ed è al 100% multipiattaforma
+        // GetApplicationDirectory() is provided by Raylib and is 100% cross-platform
         std::filesystem::path basePath(GetApplicationDirectory());
         
         for (int i = 0; i < 5; ++i) {
             std::filesystem::path testPath = basePath / "assets";
             if (std::filesystem::exists(testPath) && std::filesystem::is_directory(testPath)) {
-                // ".make_preferred()" converte i path separator in "\\" su Windows e "/" su Mac/Linux
+                // ".make_preferred()" converts path separators to "\\" on Windows and "/" on Mac/Linux
                 return (testPath / subfolder).make_preferred().string();
             }
             
@@ -43,7 +43,7 @@ namespace OSUtils {
             basePath = basePath.parent_path();
         }
         
-        // Fallback: ritorna la directory dell'eseguibile se non trova la cartella assets
+        // Fallback: returns the executable directory if it doesn't find the assets folder
         return GetApplicationDirectory();
     }
 
