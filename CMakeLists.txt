@@ -89,6 +89,14 @@ target_include_directories(TrackmakerEditor PRIVATE
 # 6. Link libraries (Only Raylib needs dynamic linking)
 target_link_libraries(TrackmakerEditor PRIVATE raylib)
 
+# Enable SSE3 for Vec4.h SIMD instructions (_mm_hadd_ps) needed by GCC on Linux
+if(CMAKE_SYSTEM_PROCESSOR MATCHES "(x86_64|amd64|AMD64|i686|i386|x86)")
+    if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+        target_compile_options(TrackmakerEditor PRIVATE -msse3)
+    endif()
+endif()
+
+
 # ==============================================================================
 # 7. Installation & Packaging (CPack)
 # ==============================================================================
